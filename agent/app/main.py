@@ -10,7 +10,7 @@ import httpx
 load_dotenv()
 
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://ollama:11434")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2:3b")
 
 
 class LoadingAnimation:
@@ -121,9 +121,6 @@ def main():
     answer = call_ollama(initial_prompt)
     loader.stop()
     
-    chat_history.append({"role": "assistant", "content": answer, "timestamp": datetime.now()})
-    print("[Agent]:", repr(answer))
-
     # Check if we have a TTY for interactive input
     if sys.stdin.isatty():
         print("[System]: Running in interactive mode")

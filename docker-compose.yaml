@@ -14,6 +14,8 @@ services:
       timeout: 10s
       retries: 5
       start_period: 40s
+    env_file:
+      - .env
     environment:
       - OLLAMA_HOST=0.0.0.0
     networks:
@@ -55,4 +57,3 @@ volumes:
 networks:
   local_code_network:
     driver: bridge
-    internal: true  

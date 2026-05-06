@@ -3,6 +3,8 @@
 A Docker-based local coding agent project that runs an Ollama model container and a Python agent container.
 The agent connects to Ollama over an internal bridge network and provides an interactive terminal experience.
 
+> Note: The Agent is just a ChatBot as of now (agentic capabilites are still in devellopment).
+
 ## Project Overview
 
 This project builds a secure local coding assistant using:
@@ -18,7 +20,7 @@ The agent is designed to run inside Docker and connect to Ollama over an isolate
 
 - `ollama` service
   - Runs the Ollama server
-  - Serves the `qwen2.5-coder:7b` model
+  - Serves any model `OLLAMA_MODEL=<model>` configured in `.env` file
   - Uses `/scripts/start_ollama.sh` to configure `OLLAMA_HOST` and launch the server
   - Exposes port `11434` internally only
 
@@ -32,8 +34,6 @@ The agent is designed to run inside Docker and connect to Ollama over an isolate
 
 - `local_code_network`
   - `driver: bridge`
-  - `internal: true`
-  - Keeps Ollama and the agent isolated from external networks
 
 ### Storage
 
@@ -44,9 +44,9 @@ The agent is designed to run inside Docker and connect to Ollama over an isolate
 ## Security
 
 This project uses several Docker hardening measures:
-
+<!-- 
 - `internal: true` network
-  - prevents external containers or hosts from joining the same Docker network
+  - prevents external containers or hosts from joining the same Docker network -->
 
 - `expose: 11434` for Ollama
   - does not publish a host port
@@ -100,13 +100,34 @@ Key files:
 - FastAPI / SQLAlchemy dependencies in the agent environment
 - `httpx` for Ollama API requests
 - `python-dotenv` for environment variable loading
+<!-- 
+## Configuration Guide
+
+This project supports two deployment modes controlled by `.env` and `docker-compose.yaml`:
+
+1. Secured Mode `(SECURED_NETWORK=true, internal: true)`
+- Maximum isolation
+- Manual model management
+- Recommended for production/shared hosts
+
+2. Convenience Mode `(SECURED_NETWORK=false, open network)`
+- Automatic model pulling from .env
+- Accessible to other Docker containers
+- Recommended for personal development
+
+###  Configuration Matrix 
+
+| Mode        | .env                                  | docker-compose.yaml          | Model Management           | Security          |
+| ----------- | ------------------------------------- | ---------------------------- | -------------------------- | ----------------- |
+| Secured     | `SECURED_NETWORK=true`                  | `internal: true`               | Manual `docker compose exec` | Highest           |
+| Convenience | `SECURED_NETWORK=false` `OLLAMA_MODEL=<model>` | `# internal: true` (commented) | Auto-pull                  | Docker-accessible | -->
 
 ## Setup
 
 ### 1. Clone repository
 
 ```bash
-git clone <repository-url> local_coding_agent
+git clone https://github.com/himmat12/local-coding-agent.git local_coding_agent
 cd local_coding_agent
 ```
 
@@ -116,7 +137,7 @@ Create or update the `.env` file with:
 
 ```env
 OLLAMA_HOST=http://ollama:11434
-OLLAMA_MODEL=qwen2.5-coder:7b
+OLLAMA_MODEL=<model> # qwen2.5-coder:7b
 AGENT_WORKSPACE=/workspace
 ```
 
@@ -138,6 +159,26 @@ docker compose ps
 You should see both `ollama` and `local-code-agent` running.
 
 ## Getting Started
+
+<!-- ### Setup Ollama Models
+
+Initially the Ollama service container does not includes any models. Therefore, you need to install your preferred models.
+
+```
+docker compose exec ollama bash
+
+```
+
+Once into bash terminal of Ollama service container, pull the models
+
+bash
+```
+ollama pull <model> 
+# or 
+# ollama pull qwen2.5-coder:7b
+# or 
+# ollama pull lamma3.2:3b
+``` -->
 
 ### Run the agent interactively
 
@@ -193,9 +234,21 @@ Within the interactive agent terminal, use these commands:
 
 - The agent is intentionally not started automatically in the container CMD because it is interactive.
 - Use `docker compose exec agent python3 main.py` when you want a live session.
-- The `agent` container is read-only and uses `tmpfs` for temporary runtime data.
+- The `agent` container is read-only and uses `tmpfs` for temporary runtime data.        
 
 ## Troubleshooting
+
+### Logging
+
+To see services logs:
+
+```bash
+docker compose logs -f ollama # for ollama running service logs
+```
+
+```bash
+docker compose logs -f agent # for agent running service logs
+```
 
 ### If the agent is not interactive
 
