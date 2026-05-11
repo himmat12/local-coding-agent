@@ -46,6 +46,7 @@ def call_ollama(prompt: str) -> str:
         "model": OLLAMA_MODEL,
         "prompt": prompt,
         "stream": False,
+        "json": True  
     }
     try:
         resp = httpx.post(url, json=payload, timeout=300) # time out after 5 minutes - for long running tasks

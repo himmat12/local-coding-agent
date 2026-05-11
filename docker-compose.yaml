@@ -2,8 +2,10 @@ services:
   ollama:
     image: ollama/ollama:latest
     container_name: ollama
-    expose:
-      - 11434
+    ports:
+      - 11434:11434
+    # expose:
+    #   - 11434
     volumes:
       - ollama_data:/root/.ollama
       - ./scripts/start_ollama.sh:/start_ollama.sh:ro
