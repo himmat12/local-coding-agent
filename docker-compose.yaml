@@ -63,6 +63,16 @@ services:
     tty: true
     networks:
       - local_code_network
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
+      
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --label-enable --cleanup --interval 300
 
 volumes:
   ollama_data:
