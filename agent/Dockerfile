@@ -1,5 +1,10 @@
 FROM debian:bookworm-slim
 
+LABEL org.opencontainers.image.source="https://github.com/himmat12/local-coding-agent"
+LABEL org.opencontainers.image.name="local-coding-agent"
+LABEL org.opencontainers.image.description="A Docker-based local coding agent that runs an Ollama model container and a Python agent container. The agent connects to Ollama over an internal bridge network and provides an interactive terminal experience."
+LABEL org.opencontainers.image.licenses="MIT"
+
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
