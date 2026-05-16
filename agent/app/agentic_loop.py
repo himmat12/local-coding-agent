@@ -21,7 +21,7 @@ def ollama_generate(prompt: str, is_json_response: bool = True):
     payload = {
         "model": OLLAMA_MODEL,
         "prompt": prompt,
-        "stream": False,
+        "stream": True,
     }
 
     if is_json_response:
@@ -52,6 +52,7 @@ def create_message(role: str, content: str ) -> dict:
         "content": content,
         "timestamp": f"{datetime.now()}"
     }
+    
 system_message = create_message(
     "system",
     """
@@ -114,10 +115,24 @@ def validate_tool_args(tool_name: str, args: dict) -> tuple[bool, str]:
         return True, "Valid"
     except jsonschema.ValidationError as e:
         return False, e.message
-    
+
+def run_planning_agent(user_prompt: str):
+    planning_prompt = f"""
+    You are a planning agent that creates a step-by-step plan to answer the user's question.  
+    Your response should be a JSON object with a "plan" field that contains an array of steps. 
+    Each step should be a string describing a single action or thought process that leads towards 
+    answering the user's question. The plan should be detailed and cover all necessary steps to arrive at the final answer. 
+    The user's question is: "{user_prompt}".
+    """
+    return ollama_generate(planning_prompt)
+
 
 def run_agent(user_prompt: str, max_steps: int = 5):
-    conversation_context.append(create_message("user", user_prompt))
+    plan = run_planning_agent(user_prompt)
+    conversation_context.append(create_message("plan", plan))
+    print(f"\n[plan]: Generated plan:\n{plan}\n")
+    
+    conversation_context.append(create_message("[plan]", plan))
 
     for step in range(max_steps):
         context = parse_conversation_context()
@@ -145,19 +160,19 @@ def run_agent(user_prompt: str, max_steps: int = 5):
             is_valid, validation_msg = validate_tool_args(tool_name, arguments)
 
             if not is_valid:
-                observation = f"Tool '{tool_name}' validation failed: {validation_msg}"
-                print(f"[observation]: {observation}")
-                conversation_context.append(create_message("observation", observation))
+                tool_call_respose = f"Tool '{tool_name}' validation failed: {validation_msg}"
+                print(f"[tool_call]: {tool_call_respose}")
+                conversation_context.append(create_message("observation", tool_call_respose))
                 continue
 
             try:
                 tool_result = TOOLS[tool_name](**arguments)
-                observation = f"Tool '{tool_name}' with arguments {arguments} returned: {tool_result}"
+                tool_call_respose = f"Tool '{tool_name}' with arguments {arguments} returned: {tool_result}"
             except Exception as e:
-                observation = f"Tool '{tool_name}' failed with error: {str(e)}"
+                tool_call_respose = f"Tool '{tool_name}' failed with error: {str(e)}"
 
-            print(f"[observation]: {observation}")
-            conversation_context.append(create_message("observation", observation))
+            print(f"[tool_call]: {tool_call_respose}")
+            conversation_context.append(create_message("tool_call", tool_call_respose))
             continue
 
         else:
