@@ -33,7 +33,7 @@ services:
     networks:
       - local_code_network
     
-    entrypoint: ["scripts/start_ollama.sh"]
+    entrypoint: ["/start_ollama.sh"]
 
   agent:
     build:
