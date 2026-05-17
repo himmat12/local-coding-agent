@@ -9,15 +9,15 @@ import httpx
 from tools.arithmetic_tools import TOOLS  
 from SCHEMAS import AGENT_SCHEMA, TOOL_SPECS
 
-
 load_dotenv()
-
-OLLAMA_HOST = lambda: "http://100.88.9.73:11434" if os.getenv("ENV") == "dev" else "http://ollama:11434"
+OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2:3b")
 
 
 def ollama_generate(prompt: str, is_json_response: bool = True):
     url = f"{OLLAMA_HOST}/api/generate"
+    print(f"\n[ollama_generate]: Sending request to {url}\n")
+    
     payload = {
         "model": OLLAMA_MODEL,
         "prompt": prompt,

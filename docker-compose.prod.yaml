@@ -7,3 +7,5 @@ services:
     image: ghcr.io/himmat12/local-code-agent:latest
     ports:
       - "127.0.0.1:8000:8000"
+    environment:
+      - OLLAMA_HOST=http://localhost:11434
