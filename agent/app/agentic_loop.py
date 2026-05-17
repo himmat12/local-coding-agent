@@ -12,7 +12,7 @@ from SCHEMAS import AGENT_SCHEMA, TOOL_SPECS
 
 load_dotenv()
 
-OLLAMA_HOST = "http://ollama:11434"
+OLLAMA_HOST = lambda: "http://100.88.9.73:11434" if os.getenv("ENV") == "dev" else "http://ollama:11434"
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2:3b")
 
 
@@ -21,7 +21,7 @@ def ollama_generate(prompt: str, is_json_response: bool = True):
     payload = {
         "model": OLLAMA_MODEL,
         "prompt": prompt,
-        "stream": True,
+        "stream": False,
     }
 
     if is_json_response:
