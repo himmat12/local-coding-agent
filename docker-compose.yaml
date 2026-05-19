@@ -17,7 +17,6 @@ services:
     env_file:
       - .env
     environment:
-      - OLLAMA_HOST=0.0.0.0
         # - CUDA_VISIBLE_DEVICES=0  # Prioritizes GPU 0 exclusively for container
       - OLLAMA_CONTEXT_LENGTH=2048  # Safe for 4GB
         # - OLLAMA_FLASH_ATTENTION=false  # Avoids allocation crashes
@@ -39,7 +38,7 @@ services:
     build:
       context: ./agent
       dockerfile: Dockerfile
-    container_name: local-code-agent
+    container_name: agent
     depends_on:
       ollama:
         condition: service_healthy
