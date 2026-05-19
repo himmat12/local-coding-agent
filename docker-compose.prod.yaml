@@ -1,8 +1,4 @@
 services:
-  ollama:
-    ports: 
-      - "127.0.0.1:11434:11434"
-
   agent:
     image: ghcr.io/himmat12/local-code-agent:latest
     ports:
